@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>Postcardmania exam</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="controller.js"></script>
+
+ <style>
+	.ImgHeader{
+		height: 100%;
+		width: 100%;
+    	border-bottom-style: solid;
+  		border-bottom-color: gray;
+		border-bottom-width: 1px;
+	}
+
+	.gap-10 {
+		width:100%;
+		height:10px;
+	}
+</style>
+
+<script type="text/javascript">
+	
+	var shipsManager = null;
+	var quantityByPage = 10;
+
+
+	function ShowInformation(index){
+		ship = shipsManager.GetShip(index);
+
+	
+		$("#TitleId").text(ship['name']);
+
+		$("#ManufacturerId").text(ship['manufacturer']);
+		$("#ClassId").text(ship['starship_class']);
+		$("#HDRId").text(ship['hyperdrive_rating']);
+		$("#CCId").text(parseInt(ship['cargo_capacity'], 10).toLocaleString('en-US'));
+		$("#CostCId").text(parseInt(ship['cost_in_credits'], 10).toLocaleString('en-US'));
+		$("#MASId").text(ship['max_atmosphering_speed']);
+		$("#MGLT").text(ship['MGLT']);
+
+		$("#ShipInformationDialog").modal('show');
+	}
+
+	$(function(){
+		
+		function DrawRegion(data){
+
+			shipsManager.SetData(data);
+			$("#regions").html("");
+			ships = shipsManager.GetShips();
+			
+			$(".progress").modal('hide');
+			for(var i = 0; i < quantityByPage; ++i)
+			{
+				ship = shipsManager.GetShipInformation(ships[i]);
+				$("#regions").append($(ship));
+			}
+			$("#regions").append("<br>");
+
+		}
+
+		function DrawPage(index){
+			$("#progressDiv").modal('show');
+			ships = shipsManager.GetPage(index + 1, DrawRegion);
+		}
+
+		function onLoaded(){
+
+			$('#ShipInformationDialog').on('shown.bs.modal', function () {
+			  $('#myInput').focus()
+			});
+
+			$("#PrevPagesId").click(function(){
+				var page1  = parseInt($("#Page1Id").html(), 10) - 1;
+				var page2  = parseInt($("#Page2Id").html(), 10) - 1;
+				var page3  = parseInt($("#Page3Id").html(), 10) - 1;
+				var page4  = parseInt($("#Page4Id").html(), 10) - 1;
+						
+				var numPages = shipsManager.PagesCount();
+
+				page1 = (page1 - 1);
+				page2 = (page2 - 1);
+				page3 = (page3 - 1);
+				page4 = (page4 - 1);
+
+				if(page1 < 0)
+					page1 = numPages + page1;
+				if(page2 < 0)
+					page2 = numPages + page2;
+				if(page3 < 0)
+					page3 = numPages + page3;
+				if(page4 < 0)
+					page4 = numPages + page4;
+
+				$("#Page1Id").html(page1 + 1);
+				$("#Page2Id").html(page2 + 1);
+				$("#Page3Id").html(page3 + 1);
+				$("#Page4Id").html(page4 + 1);
+			});
+
+			$("#NextPagesId").click(function(){
+				var page1  = parseInt($("#Page1Id").html(), 10) - 1;
+				var page2  = parseInt($("#Page2Id").html(), 10) - 1;
+				var page3  = parseInt($("#Page3Id").html(), 10) - 1;
+				var page4  = parseInt($("#Page4Id").html(), 10) - 1;
+						
+				var numPages = shipsManager.PagesCount();
+
+				page1 = (page1 + 1) % numPages;
+				page2 = (page2 + 1) % numPages;
+				page3 = (page3 + 1) % numPages;
+				page4 = (page4 + 1) % numPages;
+
+				$("#Page1Id").html(page1 + 1);
+				$("#Page2Id").html(page2 + 1);
+				$("#Page3Id").html(page3 + 1);
+				$("#Page4Id").html(page4 + 1);
+			});
+
+			$("#Page1Id").click(function(){
+				var page  = parseInt($(this).html(), 10);
+				DrawPage(page - 1);
+			});
+
+			$("#Page2Id").click(function(){
+				var page  = parseInt($(this).html(), 10);
+				DrawPage(page - 1);
+			});
+
+			$("#Page3Id").click(function(){
+				var page  = parseInt($(this).html(), 10);
+				DrawPage(page - 1);
+			});
+
+			$("#Page4Id").click(function(){
+				var page  = parseInt($(this).html(), 10);
+				DrawPage(page - 1);
+			});
+		}
+
+		shipsManager = new ShipsManager();	
+		onLoaded();
+		DrawPage(0);	
+	});
+</script>
+
+<body style="background-color: black">
+<div class="container-fluid">
+  <div class="col-md-2">
+  </div>
+
+  <div class="col-md-8">
+	<div class="row">
+		<img class="ImgHeader" id="imgHeaderId" src="img/header.jpg" />
+	</div>
+	<div class="row" style="color: white; text-align: center;">
+	  	<h1>Starships</h1>
+	</div>
+	<div class="row" style="text-align: center; background-color: white">
+			<nav aria-label="Page navigation">
+			  <ul class="pagination">
+			    <li style="text-decoration-color: black">
+			      <a style="color: black" id="PrevPagesId" aria-label="Previous">
+			        <span aria-hidden="true">&laquo;</span>
+			      </a>
+			    </li>
+				    <li><a style="color: black" id="Page1Id">1</a></li>
+				    <li><a style="color: black" id="Page2Id">2</a></li>
+				    <li><a style="color: black" id="Page3Id">3</a></li>
+				    <li><a style="color: black" id="Page4Id">4</a></li>
+			    <li>
+			      <a style="color: black" id="NextPagesId" aria-label="Next">
+			        <span aria-hidden="true">&raquo;</span>
+			      </a>
+			    </li>
+			  </ul>
+			</nav>
+		<!--Regions-->
+		<div id="regions">
+		</div>
+	</div>
+  </div>
+</div>
+</body>
+
+<div id="ShipInformationDialog" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: black; color: white;">
+        <h4 class="modal-title" id="TitleId">Modal title</h4>
+      </div>
+      <div class="modal-body">
+      		<div class="form-group">
+	        	<div class="col-md-5">
+	        		<label>Manufacturer: </label>
+	        	</div>
+	        	<div class="col-md-7">
+	        		<p id="ManufacturerId"></p>
+	        	</div>
+	        </div>
+
+	        <div class="form-group">
+	        	<div class="col-md-5">
+	        		<label>Starship Class: </label>
+	        	</div>
+	        	<div class="col-md-7">
+	        		<p id="ClassId"></p>
+	        	</div>
+	        </div>
+
+	        <div class="form-group">
+				<div class="col-md-5">
+					<label>Hyperdrive Rating: </label> 
+				</div>
+				<div class="col-md-7">
+					<p id="HDRId"></p>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="col-md-5">
+					<label>Cargo Capacity: </label>
+				</div>
+				<div class="col-md-7">
+					<p id="CCId"></p>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<div class="col-md-5">
+					<label>Cost in Credits: </label>
+				</div>
+				<div class="col-md-7">
+					<p id="CostCId"></p>
+				</div>
+			</div>			 
+			
+			<div class="form-group">
+				<div class="col-md-5">
+					<label>Max Atmosphering Speed: </label>
+				</div>
+				<div class="col-md-7">
+					<p id="MASId"></p>
+				</div>
+			</div>			
+
+			<div class="form-group">
+				<div class="col-md-5">
+					<label>MGLT: </label>
+				</div>
+				<div class="col-md-7">
+					<p id="MGLT"></p>
+				</div>
+			</div>
+	  </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-dismiss="modal">Ok</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div id="progressDiv" class="progress">
+    <div class="progress-bar progress-bar-striped active" 
+        role="progressbar" 
+        aria-valuenow="100" 
+        aria-valuemin="0" 
+        aria-valuemax="100" 
+        style="width: 100%;">
+    </div>
+</div>
+</html>
